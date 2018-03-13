@@ -176,22 +176,22 @@ func (s *executor) buildContainer(name, image string, imageDefinition common.Ima
 		privileged = s.Config.Kubernetes.Privileged
 	}
 
+	var entrypoint []string
+
 	if len(command) == 0 && len(imageDefinition.Command) > 0 {
 		command = imageDefinition.Command
 	}
 
-	var args []string
 	if len(imageDefinition.Entrypoint) > 0 {
-		args = command
-		command = imageDefinition.Entrypoint
+		entrypoint = imageDefinition.Entrypoint
 	}
 
 	return api.Container{
 		Name:            name,
 		Image:           image,
 		ImagePullPolicy: api.PullPolicy(s.pullPolicy),
-		Command:         command,
-		Args:            args,
+		Command:         entrypoint,
+		Args:            command,
 		Env:             buildVariables(s.Build.GetAllVariables().PublicOrInternal()),
 		Resources: api.ResourceRequirements{
 			Limits:   limits,
